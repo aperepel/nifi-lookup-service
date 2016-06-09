@@ -19,6 +19,7 @@ package org.apache.nifi.lookup;
 import org.apache.nifi.reporting.InitializationException;
 import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,11 +35,15 @@ public class InMemoryLookupTableServiceTest {
         final TestRunner runner = TestRunners.newTestRunner(TestProcessor.class);
         final InMemoryLookupTableService service = new InMemoryLookupTableService();
         runner.addControllerService("test-good", service);
-
-        runner.setProperty(service, InMemoryLookupTableService.MY_PROPERTY, "test-value");
         runner.enableControllerService(service);
-
         runner.assertValid(service);
+
+        Object put = service.put("key1", "value1");
+        Assert.assertNull(put);
+
+        Object updated = service.put("key1", "value1mod");
+        Assert.assertEquals("value1", updated);
+
     }
 
 }

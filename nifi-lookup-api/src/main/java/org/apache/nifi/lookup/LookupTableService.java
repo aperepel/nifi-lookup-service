@@ -19,12 +19,15 @@ package org.apache.nifi.lookup;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.controller.ControllerService;
-import org.apache.nifi.processor.exception.ProcessException;
 
 @Tags({"lookup", "cache"})
 @CapabilityDescription("Lookup table service")
 public interface LookupTableService extends ControllerService {
 
-    public void execute()  throws ProcessException;
+    String get(String id);
+
+    String put(String id, String value);
+
+    String putIfAbsent(String id, String value);
 
 }

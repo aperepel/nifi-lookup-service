@@ -16,10 +16,6 @@
  */
 package org.apache.nifi.lookup;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.annotation.lifecycle.OnDisabled;
@@ -27,26 +23,34 @@ import org.apache.nifi.annotation.lifecycle.OnEnabled;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.controller.AbstractControllerService;
 import org.apache.nifi.controller.ConfigurationContext;
-import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.util.StandardValidators;
 import org.apache.nifi.reporting.InitializationException;
 
-@Tags({ "example"})
-@CapabilityDescription("Example ControllerService implementation of LookupTableService.")
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+@Tags({"lookup", "in memory", "cache"})
+@CapabilityDescription("A local in-memory lookup table backed by a concurrent map")
 public class InMemoryLookupTableService extends AbstractControllerService implements LookupTableService {
 
-    public static final PropertyDescriptor MY_PROPERTY = new PropertyDescriptor
-            .Builder().name("My Property")
-            .description("Example Property")
-            .required(true)
-            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-            .build();
+    public static final PropertyDescriptor PROP_INITIAL_CAPACITY = new PropertyDescriptor.Builder()
+                                                                           .name("Initial Capacity")
+                                                                           .description("Example Property")
+                                                                           .required(true)
+                                                                           .defaultValue("1000")
+                                                                           .addValidator(StandardValidators.POSITIVE_INTEGER_VALIDATOR)
+                                                                           .build();
 
     private static final List<PropertyDescriptor> properties;
 
+    private ConcurrentMap<String, String> cache;
+
     static {
         final List<PropertyDescriptor> props = new ArrayList<>();
-        props.add(MY_PROPERTY);
+        props.add(PROP_INITIAL_CAPACITY);
         properties = Collections.unmodifiableList(props);
     }
 
@@ -56,24 +60,33 @@ public class InMemoryLookupTableService extends AbstractControllerService implem
     }
 
     /**
-     * @param context
-     *            the configuration context
-     * @throws InitializationException
-     *             if unable to create a database connection
+     * @param context the configuration context
+     * @throws InitializationException if unable to create a database connection
      */
     @OnEnabled
     public void onEnabled(final ConfigurationContext context) throws InitializationException {
-
+        Integer initialCapacity = context.getProperty(PROP_INITIAL_CAPACITY).asInteger();
+        cache = new ConcurrentHashMap<>(initialCapacity);
     }
 
     @OnDisabled
     public void shutdown() {
-
+        cache.clear();
+        cache = null;
     }
 
     @Override
-    public void execute() throws ProcessException {
-
+    public String get(String id) {
+        return cache.get(id);
     }
 
+    @Override
+    public String put(String id, String value) {
+        return cache.put(id, value);
+    }
+
+    @Override
+    public String putIfAbsent(String id, String value) {
+        return cache.putIfAbsent(id, value);
+    }
 }
