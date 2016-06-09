@@ -35,9 +35,9 @@ public class TestProcessor extends AbstractProcessor {
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
         List<PropertyDescriptor> propDescs = new ArrayList<>();
         propDescs.add(new PropertyDescriptor.Builder()
-                .name("MyService test processor")
-                .description("MyService test processor")
-                .identifiesControllerService(MyService.class)
+                .name("LookupTableService test processor")
+                .description("LookupTableService test processor")
+                .identifiesControllerService(LookupTableService.class)
                 .required(true)
                 .build());
         return propDescs;

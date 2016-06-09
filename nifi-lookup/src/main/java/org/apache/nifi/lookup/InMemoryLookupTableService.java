@@ -19,7 +19,6 @@ package org.apache.nifi.lookup;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
@@ -33,8 +32,8 @@ import org.apache.nifi.processor.util.StandardValidators;
 import org.apache.nifi.reporting.InitializationException;
 
 @Tags({ "example"})
-@CapabilityDescription("Example ControllerService implementation of MyService.")
-public class StandardMyService extends AbstractControllerService implements MyService {
+@CapabilityDescription("Example ControllerService implementation of LookupTableService.")
+public class InMemoryLookupTableService extends AbstractControllerService implements LookupTableService {
 
     public static final PropertyDescriptor MY_PROPERTY = new PropertyDescriptor
             .Builder().name("My Property")

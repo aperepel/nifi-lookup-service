@@ -16,15 +16,29 @@
  */
 package org.apache.nifi.lookup;
 
-import org.apache.nifi.annotation.documentation.CapabilityDescription;
-import org.apache.nifi.annotation.documentation.Tags;
-import org.apache.nifi.controller.ControllerService;
-import org.apache.nifi.processor.exception.ProcessException;
+import org.apache.nifi.reporting.InitializationException;
+import org.apache.nifi.util.TestRunner;
+import org.apache.nifi.util.TestRunners;
+import org.junit.Before;
+import org.junit.Test;
 
-@Tags({"example"})
-@CapabilityDescription("Example Service API.")
-public interface MyService extends ControllerService {
+public class InMemoryLookupTableServiceTest {
 
-    public void execute()  throws ProcessException;
+    @Before
+    public void init() {
+
+    }
+
+    @Test
+    public void testService() throws InitializationException {
+        final TestRunner runner = TestRunners.newTestRunner(TestProcessor.class);
+        final InMemoryLookupTableService service = new InMemoryLookupTableService();
+        runner.addControllerService("test-good", service);
+
+        runner.setProperty(service, InMemoryLookupTableService.MY_PROPERTY, "test-value");
+        runner.enableControllerService(service);
+
+        runner.assertValid(service);
+    }
 
 }
